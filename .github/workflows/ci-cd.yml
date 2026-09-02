@@ -27,9 +27,15 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Resolve ECR registry URI
+        id: ecr-registry
+        run: |
+          account_id=$(aws sts get-caller-identity --query Account --output text)
+          echo "registry=${account_id}.dkr.ecr.us-east-1.amazonaws.com" >> "$GITHUB_OUTPUT"
+
       - name: Build and push image to Amazon ECR
         uses: docker/build-push-action@v5
         with:
           context: ./app
           push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/python-metrics-app:${{ github.sha }}
+          tags: ${{ steps.ecr-registry.outputs.registry }}/python-metrics-app:${{ github.sha }}
