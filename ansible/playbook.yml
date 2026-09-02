@@ -1,0 +1,32 @@
+---
+- name: Configurar EC2 para Docker
+  hosts: app
+  become: yes
+  tasks:
+    - name: Atualizar sistema
+      yum:
+        name: "*"
+        state: latest
+        update_cache: yes
+
+    - name: Instalar Docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Iniciar e habilitar Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Adicionar usuário ao grupo docker
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+
+    - name: Instalar python3-pip (útil)
+      yum:
+        name: python3-pip
+        state: present
